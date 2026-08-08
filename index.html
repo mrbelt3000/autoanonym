@@ -1,470 +1,71 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anonyme Kfz-Reparatur Plattform Demo</title>
-    <!-- Tailwind CSS CDN für Styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome für Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AutoAnonym – Frontend-Prototyp für anonyme Kfz-Aufträge und Gutachten">
+  <title>AutoAnonym – Plattform-Prototyp</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
-
-    <!-- Header Navigation mit Rollen-Umschalter -->
-    <header class="gradient-bg text-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
-            <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-car-wrench text-2xl text-blue-400"></i>
-                <span class="font-bold text-xl tracking-wide">AutoAnonym</span>
-                <span class="bg-blue-600 text-xs px-2 py-0.5 rounded-full font-semibold uppercase">Demo Prototype</span>
-            </div>
-
-            <!-- Rollen-Umschalter (Kunde / Werkstatt / System) -->
-            <div class="flex bg-slate-800/80 p-1 rounded-lg border border-slate-700">
-                <button onclick="switchRole('kunde')" id="btn-kunde" class="role-btn px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-blue-600 text-white shadow">
-                    <i class="fa-solid fa-user mr-1.5"></i> Kunde (Kfz-Halter)
-                </button>
-                <button onclick="switchRole('werkstatt')" id="btn-werkstatt" class="role-btn px-4 py-1.5 rounded-md text-sm font-medium transition-all text-slate-300 hover:text-white">
-                    <i class="fa-solid fa-gears mr-1.5"></i> Werkstatt
-                </button>
-                <button onclick="switchRole('system')" id="btn-system" class="role-btn px-4 py-1.5 rounded-md text-sm font-medium transition-all text-slate-300 hover:text-white">
-                    <i class="fa-solid fa-network-wired mr-1.5"></i> System & Matching
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Haupt-Inhaltsbereich -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6">
-
-        <!-- ================= KUNDEN VIEW ================= -->
-        <div id="view-kunde" class="role-view space-y-6">
-            <div class="flex justify-between items-center bg-blue-50 p-4 rounded-xl border border-blue-200">
-                <div>
-                    <h2 class="text-xl font-bold text-blue-900">Kunden Dashboard</h2>
-                    <p class="text-sm text-blue-700">Erstellen Sie anonyme Reparaturanfragen und vergleichen Sie Angebote.</p>
-                </div>
-                <div class="bg-white px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-800 border border-blue-200 shadow-sm flex items-center gap-2">
-                    <i class="fa-solid fa-user-shield text-emerald-600 text-sm"></i> Anonymität aktiv
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- 1. Fahrzeug & Garage -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="font-bold text-lg mb-3 text-slate-800 flex items-center gap-2">
-                        <i class="fa-solid fa-car text-blue-600"></i> Mein Fahrzeug
-                    </h3>
-                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-4 text-sm space-y-1">
-                        <p class="font-bold text-slate-900">Peugeot 407 Coupé</p>
-                        <p class="text-slate-600">VIN: VF36D...9823</p>
-                        <p class="text-slate-600">Kennzeichen: BN-FK 2026</p>
-                        <span class="inline-block mt-1 text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-medium">Fahrzeugschein verifiziert</span>
-                    </div>
-                </div>
-
-                <!-- 2. Anfrage erstellen -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm md:col-span-2">
-                    <h3 class="font-bold text-lg mb-3 text-slate-800 flex items-center gap-2">
-                        <i class="fa-solid fa-plus-circle text-blue-600"></i> Neue Reparaturanfrage erstellen
-                    </h3>
-                    <form onsubmit="createRequest(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Schadensbeschreibung / Reparaturwunsch</label>
-                            <textarea id="req-desc" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" rows="2" placeholder="z. B. Keilriemen quietscht & Auspuff klappert bei Kaltstart..."></textarea>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Wunschtermin</label>
-                                <input type="date" required id="req-date" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" value="2026-08-10">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Fotos Upload</label>
-                                <input type="file" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                            </div>
-                        </div>
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg text-sm transition">Anonyme Anfrage an Werkstätten senden</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- 3. Angebote vergleichen -->
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                <h3 class="font-bold text-lg mb-4 text-slate-800 flex items-center justify-between">
-                    <span><i class="fa-solid fa-list-check text-blue-600 mr-2"></i> Eingegangene Angebote für Ihre Anfrage</span>
-                    <span class="text-xs font-normal text-slate-500">Werkstattnamen bleiben bis zur Buchung verdeckt</span>
-                </h3>
-
-                <div id="offers-list" class="space-y-4">
-                    <!-- Dynamische Angebote per JS -->
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= WERKSTATT VIEW ================= -->
-        <div id="view-werkstatt" class="role-view hidden space-y-6">
-            <div class="flex justify-between items-center bg-emerald-50 p-4 rounded-xl border border-emerald-200">
-                <div>
-                    <h2 class="text-xl font-bold text-emerald-900">Werkstatt Dashboard</h2>
-                    <p class="text-sm text-emerald-700">Anfragen im Umkreis einsehen, Angebote kalkulieren & Aufträge sichern.</p>
-                </div>
-                <div class="bg-white px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-800 border border-emerald-200 shadow-sm flex items-center gap-2">
-                    <i class="fa-solid fa-shield-halved text-emerald-600"></i> Kundenanfragen anonymisiert
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Werkstatt Profil Info -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="font-bold text-lg mb-3 text-slate-800"><i class="fa-solid fa-warehouse text-emerald-600 mr-2"></i> Profil & Radius</h3>
-                    <div class="text-sm space-y-2">
-                        <p class="font-semibold text-slate-900">Kfz Meisterbetrieb Bonn (Demo)</p>
-                        <p class="text-xs text-slate-500">Steuernummer: DE31920381</p>
-                        <p class="text-xs text-slate-500">Spezialisierung: Karosserie, Motor, Bremsen</p>
-                        <div class="mt-3 p-2 bg-slate-50 rounded border text-xs">
-                            <span class="font-semibold text-slate-700">Arbeitsradius:</span> 25 km um Bonn
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feed für Anfragen -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm md:col-span-2 space-y-4">
-                    <h3 class="font-bold text-lg text-slate-800 flex items-center justify-between">
-                        <span><i class="fa-solid fa-bell text-emerald-600 mr-2"></i> Neue Reparaturanfragen im Radius</span>
-                        <span class="text-xs font-normal text-amber-600 font-semibold"><i class="fa-solid fa-clock"></i> Max. 3h Antwortzeit</span>
-                    </h3>
-
-                    <div id="requests-feed" class="space-y-4">
-                        <!-- Dynamische Anfragen per JS -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= SYSTEM & MATCHING VIEW ================= -->
-        <div id="view-system" class="role-view hidden space-y-6">
-            <div class="bg-slate-900 text-white p-6 rounded-xl border border-slate-800 shadow-xl space-y-4">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-xl font-bold text-blue-400 flex items-center gap-2">
-                        <i class="fa-solid fa-network-wired"></i> System-Architektur & Provisions-Engine
-                    </h2>
-                    <span class="bg-blue-500/20 text-blue-300 text-xs px-3 py-1 rounded-full border border-blue-500/30">12% Provision System</span>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                    <div class="bg-slate-800/80 p-4 rounded-lg border border-slate-700">
-                        <p class="text-xs text-slate-400 uppercase font-semibold">1. Matching System</p>
-                        <p class="text-sm font-medium mt-1">Geofencing & Kategorie-Filter</p>
-                        <p class="text-xs text-slate-400 mt-2">Sendet Push-Benachrichtigung an Werkstätten im festgelegten Radius.</p>
-                    </div>
-                    <div class="bg-slate-800/80 p-4 rounded-lg border border-slate-700">
-                        <p class="text-xs text-slate-400 uppercase font-semibold">2. Anonymitäts-Sperre</p>
-                        <p class="text-sm font-medium mt-1">Escrow & Kontaktdaten-Sperre</p>
-                        <p class="text-xs text-slate-400 mt-2">Namen, Nummern und genaue Adressen werden serverseitig ausgeblendet.</p>
-                    </div>
-                    <div class="bg-slate-800/80 p-4 rounded-lg border border-slate-700">
-                        <p class="text-xs text-slate-400 uppercase font-semibold">3. Provisions-Abrechnung</p>
-                        <p class="text-sm font-medium mt-1">12% Gebühr nach Zahlung</p>
-                        <p class="text-xs text-slate-400 mt-2">Automatische Rechnungserstellung an Werkstatt nach Kundenbuchung.</p>
-                    </div>
-                </div>
-
-                <!-- Transaction Log -->
-                <div class="pt-4 border-t border-slate-800">
-                    <h3 class="text-sm font-bold text-slate-300 mb-2">System-Transaktionsprotokoll (Echtzeit Demo)</h3>
-                    <div id="system-logs" class="bg-slate-950 p-3 rounded-lg font-mono text-xs text-emerald-400 space-y-1 h-36 overflow-y-auto border border-slate-800">
-                        <p>[SYSTEM INIT] Anonyme Plattform-Engine gestartet...</p>
-                        <p>[MATCHING] Radius-Matching aktiv (Umkreis 25km)...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Modal für Bezahlvorgang (Checkout) -->
-    <div id="modal-checkout" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white max-w-md w-full rounded-xl shadow-2xl p-6 space-y-4">
-            <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="font-bold text-lg text-slate-900">Kostenpflichtig beauftragen</h3>
-                <button onclick="closeCheckout()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-
-            <div id="checkout-details" class="bg-slate-50 p-3 rounded-lg text-sm space-y-2">
-                <!-- Dynamischer Inhalt -->
-            </div>
-
-            <div class="space-y-2">
-                <p class="text-xs font-semibold text-slate-600 uppercase">Zahlungsmethode wählen</p>
-                <div class="grid grid-cols-3 gap-2">
-                    <label class="border p-2 rounded-lg text-center cursor-pointer hover:border-blue-500 flex flex-col items-center">
-                        <input type="radio" name="pay" checked class="mb-1">
-                        <span class="text-xs font-bold text-blue-800">PayPal</span>
-                    </label>
-                    <label class="border p-2 rounded-lg text-center cursor-pointer hover:border-blue-500 flex flex-col items-center">
-                        <input type="radio" name="pay" class="mb-1">
-                        <span class="text-xs font-bold text-pink-600">Klarna</span>
-                    </label>
-                    <label class="border p-2 rounded-lg text-center cursor-pointer hover:border-blue-500 flex flex-col items-center">
-                        <input type="radio" name="pay" class="mb-1">
-                        <span class="text-xs font-bold text-purple-800">Sofort</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="text-xs text-slate-500 space-y-1">
-                <label class="flex items-start gap-2 cursor-pointer">
-                    <input type="checkbox" id="chk-storno" required class="mt-0.5">
-                    <span>Ich akzeptiere die Stornobedingungen der Werkstatt & die AGB.</span>
-                </label>
-            </div>
-
-            <button onclick="confirmPayment()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-600/30">
-                Jetzt kostenpflichtig buchen
-            </button>
-        </div>
+<body>
+  <a class="skip-link" href="#hauptinhalt">Zum Hauptinhalt</a>
+  <header class="app-header">
+    <div class="header-inner">
+      <button class="brand" type="button" data-portal-home aria-label="AutoAnonym Portalstartseite">
+        <span class="brand-mark" aria-hidden="true"><span>AA</span></span>
+        <span><strong>AutoAnonym</strong><small id="portal-role-label">Kundenportal</small></span>
+      </button>
+      <div class="header-actions">
+        <button class="demo-mode-button" id="demo-mode-button" type="button" aria-controls="demo-panel" aria-expanded="false"><span class="icon icon-code" aria-hidden="true"></span><span>Demo-Modus</span></button>
+        <button class="icon-button" id="notifications-button" type="button" aria-label="Benachrichtigungen anzeigen">
+          <span class="icon icon-bell" aria-hidden="true"></span><span class="counter" id="notification-count">0</span>
+        </button>
+      </div>
     </div>
+    <section class="demo-panel" id="demo-panel" hidden aria-labelledby="demo-title">
+      <div><strong id="demo-title">Demo- und Entwicklermodus</strong><small>Nur zur Vorschau: Portalrolle wechseln</small></div>
+      <div class="demo-role-switcher" role="group" aria-label="Demo-Rolle auswählen">
+        <button type="button" data-role-target="KUNDE">Kunde</button><button type="button" data-role-target="WERKSTATT">Werkstatt</button><button type="button" data-role-target="GUTACHTER">Gutachter</button><button type="button" data-role-target="KUNDENSUPPORT">Kundensupport</button><button type="button" data-role-target="ADMIN">Admin</button>
+      </div>
+    </section>
+  </header>
 
-    <!-- JavaScript Logik -->
-    <script>
-        let currentRole = 'kunde';
-        let requests = [
-            {
-                id: 'REQ-101',
-                car: 'Peugeot 407 Coupé',
-                desc: 'Keilriemen Wechsel + Überprüfung Riemenspanner',
-                date: '2026-08-10',
-                status: 'offen'
-            }
-        ];
+  <main id="hauptinhalt" class="page-shell" tabindex="-1">
+    <div id="view-kunde" class="role-view"></div>
+    <div id="view-werkstatt" class="role-view" hidden></div>
+    <div id="view-gutachter" class="role-view" hidden></div>
+    <div id="view-kundensupport" class="role-view" hidden></div>
+    <div id="view-admin" class="role-view" hidden></div>
+  </main>
 
-        let offers = [
-            {
-                id: 'OFF-501',
-                reqId: 'REQ-101',
-                workshopId: 'Werkstatt #309 (Bonn)',
-                workshopRating: '4.9 ★ (84 Bewertungen)',
-                price: 280,
-                duration: '1 Tag (ca. 3-4 Stunden)',
-                date: '2026-08-10',
-                storno: 'Kostenlose Stornierung bis 24h vor Termin.',
-                booked: false,
-                realData: {
-                    name: 'Auto-Meisterbetrieb Müller GmbH',
-                    address: 'Hopmannstraße 12, 53177 Bonn',
-                    phone: '+49 228 9876543'
-                }
-            }
-        ];
+  <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+  <aside class="drawer" id="notifications-drawer" aria-labelledby="notifications-title" aria-hidden="true">
+    <div class="drawer-header">
+      <div><p class="eyebrow">Aktuelles</p><h2 id="notifications-title">Benachrichtigungen</h2></div>
+      <button class="icon-button" id="notifications-close" type="button" aria-label="Benachrichtigungen schließen">×</button>
+    </div>
+    <div id="notifications-list" class="stack"></div>
+    <button class="button button-secondary button-block" id="notifications-read" type="button">Alle als gelesen markieren</button>
+  </aside>
 
-        function logSystem(msg) {
-            const logs = document.getElementById('system-logs');
-            const p = document.createElement('p');
-            const time = new Date().toLocaleTimeString();
-            p.innerText = `[${time}] ${msg}`;
-            logs.appendChild(p);
-            logs.scrollTop = logs.scrollHeight;
-        }
+  <div class="modal-backdrop" id="modal-backdrop" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-header"><h2 id="modal-title">Dialog</h2><button class="icon-button" id="modal-close" type="button" aria-label="Dialog schließen">×</button></div>
+      <div id="modal-content"></div>
+    </section>
+  </div>
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
 
-        function switchRole(role) {
-            currentRole = role;
-            document.querySelectorAll('.role-view').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`view-${role}`).classList.remove('hidden');
-
-            document.querySelectorAll('.role-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-600', 'text-white', 'shadow');
-                btn.classList.add('text-slate-300');
-            });
-            document.getElementById(`btn-${role}`).classList.add('bg-blue-600', 'text-white', 'shadow');
-            document.getElementById(`btn-${role}`).classList.remove('text-slate-300');
-
-            renderUI();
-        }
-
-        function createRequest(e) {
-            e.preventDefault();
-            const desc = document.getElementById('req-desc').value;
-            const date = document.getElementById('req-date').value;
-
-            const newReq = {
-                id: `REQ-${Math.floor(100 + Math.random() * 900)}`,
-                car: 'Peugeot 407 Coupé',
-                desc: desc,
-                date: date,
-                status: 'offen'
-            };
-
-            requests.push(newReq);
-            logSystem(`[NEUE ANFRAGE] ${newReq.id} erstellt für ${newReq.car}. Push-Matching an 5 Werkstätten gesendet.`);
-            alert("Ihre anonyme Anfrage wurde erfolgreich an Werkstätten im Umkreis gesendet!");
-            renderUI();
-        }
-
-        function submitOffer(reqId) {
-            const price = prompt("Geben Sie den Angebotspreis in € ein:", "320");
-            if (!price) return;
-
-            const newOffer = {
-                id: `OFF-${Math.floor(500 + Math.random() * 900)}`,
-                reqId: reqId,
-                workshopId: 'Werkstatt #402 (Ihre Werkstatt)',
-                workshopRating: '4.8 ★ (42 Bewertungen)',
-                price: parseFloat(price),
-                duration: '1 Tag',
-                date: '2026-08-11',
-                storno: 'Stornierung bis 12h vorher möglich.',
-                booked: false,
-                realData: {
-                    name: 'Kfz-Service Zentgraf',
-                    address: 'Königswinterer Str. 88, 53227 Bonn',
-                    phone: '+49 228 1234567'
-                }
-            };
-
-            offers.push(newOffer);
-            logSystem(`[NEUES ANGEBOT] Werkstatt #402 hat ein anonymes Angebot (${price}€) abgegeben.`);
-            alert("Angebot wurde anonym an den Kunden übermittelt!");
-            renderUI();
-        }
-
-        let selectedOffer = null;
-
-        function openCheckout(offerId) {
-            selectedOffer = offers.find(o => o.id === offerId);
-            if (!selectedOffer) return;
-
-            const details = document.getElementById('checkout-details');
-            details.innerHTML = `
-                <div class="flex justify-between font-bold text-slate-800">
-                    <span>Anonymes Angebot (${selectedOffer.workshopId}):</span>
-                    <span class="text-emerald-600 text-base">${selectedOffer.price.toFixed(2)} €</span>
-                </div>
-                <p class="text-xs text-slate-500">Termin: ${selectedOffer.date} | Dauer: ${selectedOffer.duration}</p>
-                <p class="text-xs text-slate-500">Storno: ${selectedOffer.storno}</p>
-            `;
-
-            document.getElementById('modal-checkout').classList.remove('hidden');
-        }
-
-        function closeCheckout() {
-            document.getElementById('modal-checkout').classList.add('hidden');
-        }
-
-        function confirmPayment() {
-            if (!document.getElementById('chk-storno').checked) {
-                alert("Bitte akzeptieren Sie die Stornobedingungen.");
-                return;
-            }
-
-            selectedOffer.booked = true;
-            closeCheckout();
-
-            const provision = (selectedOffer.price * 0.12).toFixed(2);
-            logSystem(`[ZAHLUNG ERFOLGREICH] Kunde hat ${selectedOffer.price}€ bezahlt. Freischaltung der Daten!`);
-            logSystem(`[PROVISION] 12% Systemprovision (${provision}€) berechnet & Werkstatt belastet.`);
-
-            alert(`Zahlung erfolgreich! Kontakte freigeschaltet.\n\n12% Provision (${provision}€) wurden vom System berechnet.`);
-            renderUI();
-        }
-
-        function renderUI() {
-            const offersList = document.getElementById('offers-list');
-            offersList.innerHTML = '';
-
-            if (offers.length === 0) {
-                offersList.innerHTML = '<p class="text-sm text-slate-500 italic">Warten auf eingehende Werkstattangebote...</p>';
-            } else {
-                offers.forEach(off => {
-                    const req = requests.find(r => r.id === off.reqId);
-                    const div = document.createElement('div');
-                    div.className = 'border border-slate-200 rounded-xl p-4 transition hover:border-blue-300 bg-white';
-
-                    if (off.booked) {
-                        div.innerHTML = `
-                            <div class="flex flex-wrap justify-between items-start gap-2 border-b pb-3 mb-3">
-                                <div>
-                                    <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-bold">
-                                        <i class="fa-solid fa-lock-open mr-1"></i> BUCHUNG BESTÄTIGT & KONTAKTE FREIGESCHALTET
-                                    </span>
-                                    <h4 class="font-bold text-base text-slate-900 mt-2">${off.realData.name}</h4>
-                                    <p class="text-xs text-slate-600"><i class="fa-solid fa-location-dot text-red-500 mr-1"></i> ${off.realData.address}</p>
-                                    <p class="text-xs text-slate-600"><i class="fa-solid fa-phone text-blue-500 mr-1"></i> ${off.realData.phone}</p>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-xl font-extrabold text-slate-900">${off.price.toFixed(2)} €</span>
-                                    <p class="text-xs text-slate-500">Bezahlt via Escrow</p>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center text-xs">
-                                <span class="text-slate-500">Termin: <strong>${off.date}</strong></span>
-                                <button onclick="alert('Google Maps Navigation wird gestartet...')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-blue-700">
-                                    <i class="fa-solid fa-route mr-1"></i> Route / Navigation
-                                </button>
-                            </div>
-                        `;
-                    } else {
-                        div.innerHTML = `
-                            <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
-                                <div>
-                                    <span class="bg-amber-100 text-amber-800 text-xs px-2 py-0.5 rounded font-semibold">
-                                        <i class="fa-solid fa-user-shield mr-1"></i> ${off.workshopId}
-                                    </span>
-                                    <span class="text-xs text-slate-500 ml-2">${off.workshopRating}</span>
-                                    <p class="text-xs text-slate-600 mt-1">Anfrage: <strong>${req ? req.desc : 'Reparatur'}</strong></p>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-xl font-bold text-slate-900">${off.price.toFixed(2)} €</span>
-                                    <p class="text-xs text-slate-400">inkl. MwSt.</p>
-                                </div>
-                            </div>
-                            <div class="text-xs text-slate-500 space-y-1 mb-3">
-                                <p><i class="fa-regular fa-clock text-blue-500"></i> Reparaturdauer: ${off.duration}</p>
-                                <p><i class="fa-solid fa-rotate-left text-slate-400"></i> Storno: ${off.storno}</p>
-                            </div>
-                            <button onclick="openCheckout('${off.id}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg text-xs transition">
-                                Verdeckte Kontaktdaten buchen & freischalten
-                            </button>
-                        `;
-                    }
-                    offersList.appendChild(div);
-                });
-            }
-
-            const feed = document.getElementById('requests-feed');
-            feed.innerHTML = '';
-
-            requests.forEach(r => {
-                const div = document.createElement('div');
-                div.className = 'border border-slate-200 rounded-xl p-4 bg-slate-50 space-y-2';
-                div.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-xs font-bold text-slate-500">${r.id}</span>
-                            <h4 class="font-bold text-slate-800">${r.car}</h4>
-                        </div>
-                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                            <i class="fa-solid fa-hourglass-half"></i> 2h 45m verbleibend
-                        </span>
-                    </div>
-                    <p class="text-xs text-slate-700 bg-white p-2 rounded border border-slate-200">${r.desc}</p>
-                    <div class="flex justify-between items-center text-xs pt-1">
-                        <span class="text-slate-500">Wunschtermin: <strong>${r.date}</strong> (Bonn Radius 15km)</span>
-                        <button onclick="submitOffer('${r.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-1.5 rounded-lg">
-                            Anonymes Angebot abgeben
-                        </button>
-                    </div>
-                `;
-                feed.appendChild(div);
-            });
-        }
-
-        renderUI();
-    </script>
+  <script src="js/benachrichtigungen.js" defer></script>
+  <script src="js/status.js" defer></script>
+  <script src="js/navigation.js" defer></script>
+  <script src="js/dialoge.js" defer></script>
+  <script src="js/nachrichten.js" defer></script>
+  <script src="js/kunde.js" defer></script>
+  <script src="js/werkstatt.js" defer></script>
+  <script src="js/gutachter.js" defer></script>
+  <script src="js/support.js" defer></script>
+  <script src="js/admin.js" defer></script>
+  <script src="js/app.js" defer></script>
 </body>
 </html>
