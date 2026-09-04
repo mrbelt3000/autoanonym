@@ -45,19 +45,28 @@ jobs:
           unzip -q /tmp/blockdrop-project.zip -d /tmp/blockdrop
           test -f /tmp/blockdrop/BlockDrop-WebView/app/build.gradle.kts
 
+      - name: Set exact Play package name
+        run: |
+          FILE=/tmp/blockdrop/BlockDrop-WebView/app/build.gradle.kts
+          sed -i 's/applicationId = "com.blockdrop.game"/applicationId = "com.blockdrop.tetrisgame"/' "$FILE"
+          grep -n 'applicationId' "$FILE"
+          grep -q 'applicationId = "com.blockdrop.tetrisgame"' "$FILE"
+
       - name: Build signed release AAB
         working-directory: /tmp/blockdrop/BlockDrop-WebView
         run: gradle --no-daemon :app:bundleRelease
 
       - name: Verify AAB
         run: |
-          test -s /tmp/blockdrop/BlockDrop-WebView/app/build/outputs/bundle/release/app-release.aab
-          ls -lh /tmp/blockdrop/BlockDrop-WebView/app/build/outputs/bundle/release/app-release.aab
+          AAB=/tmp/blockdrop/BlockDrop-WebView/app/build/outputs/bundle/release/app-release.aab
+          test -s "$AAB"
+          unzip -l "$AAB" | head -40
+          ls -lh "$AAB"
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
-          name: BlockDrop-release-aab
+          name: BlockDrop-tetrisgame-release-aab
           path: /tmp/blockdrop/BlockDrop-WebView/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 7
