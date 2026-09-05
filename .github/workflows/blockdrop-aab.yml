@@ -45,12 +45,31 @@ jobs:
           unzip -q /tmp/blockdrop-project.zip -d /tmp/blockdrop
           test -f /tmp/blockdrop/BlockDrop-WebView/app/build.gradle.kts
 
-      - name: Set exact Play package name
+      - name: Apply Play package, version and launcher icon
         run: |
-          FILE=/tmp/blockdrop/BlockDrop-WebView/app/build.gradle.kts
+          ROOT=/tmp/blockdrop/BlockDrop-WebView
+          FILE="$ROOT/app/build.gradle.kts"
+          MANIFEST="$ROOT/app/src/main/AndroidManifest.xml"
+
           sed -i 's/applicationId = "com.blockdrop.game"/applicationId = "com.blockdrop.tetrisgame"/' "$FILE"
-          grep -n 'applicationId' "$FILE"
-          grep -q 'applicationId = "com.blockdrop.tetrisgame"' "$FILE"
+          sed -i 's/versionCode = 1/versionCode = 2/' "$FILE"
+          sed -i 's/versionName = "1.0"/versionName = "1.1"/' "$FILE"
+
+          mkdir -p "$ROOT/app/src/main/res/drawable"
+          base64 --decode blockdrop/icon.jpg.b64 > "$ROOT/app/src/main/res/drawable/ic_launcher.jpg"
+
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('/tmp/blockdrop/BlockDrop-WebView/app/src/main/AndroidManifest.xml')
+          s = p.read_text()
+          if 'android:icon=' not in s:
+              s = s.replace('<application\n', '<application\n        android:icon="@drawable/ic_launcher"\n        android:roundIcon="@drawable/ic_launcher"\n', 1)
+          p.write_text(s)
+          PY
+
+          grep -n 'applicationId\|versionCode\|versionName' "$FILE"
+          grep -n 'android:icon\|android:roundIcon' "$MANIFEST"
+          test -s "$ROOT/app/src/main/res/drawable/ic_launcher.jpg"
 
       - name: Build signed release AAB
         working-directory: /tmp/blockdrop/BlockDrop-WebView
@@ -60,13 +79,13 @@ jobs:
         run: |
           AAB=/tmp/blockdrop/BlockDrop-WebView/app/build/outputs/bundle/release/app-release.aab
           test -s "$AAB"
-          unzip -l "$AAB" | head -40
+          unzip -l "$AAB" | grep -E 'ic_launcher|base/manifest/AndroidManifest.xml' | head -20 || true
           ls -lh "$AAB"
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
-          name: BlockDrop-tetrisgame-release-aab
+          name: BlockDrop-v1.1-icon-release-aab
           path: /tmp/blockdrop/BlockDrop-WebView/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 7
