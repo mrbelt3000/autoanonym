@@ -56,7 +56,8 @@ jobs:
           sed -i 's/versionName = "1.0"/versionName = "1.1"/' "$FILE"
 
           mkdir -p "$ROOT/app/src/main/res/drawable"
-          base64 --decode blockdrop/icon144.jpg.b64 > "$ROOT/app/src/main/res/drawable/ic_launcher.jpg"
+          cat blockdrop/icon.part1 blockdrop/icon.part2 blockdrop/icon.part3 | base64 --decode > "$ROOT/app/src/main/res/drawable/ic_launcher.jpg"
+          file "$ROOT/app/src/main/res/drawable/ic_launcher.jpg"
 
           python3 - <<'PY'
           from pathlib import Path
@@ -79,6 +80,7 @@ jobs:
         run: |
           AAB=/tmp/blockdrop/BlockDrop-WebView/app/build/outputs/bundle/release/app-release.aab
           test -s "$AAB"
+          unzip -t "$AAB" >/dev/null
           unzip -l "$AAB" | grep -E 'ic_launcher|base/manifest/AndroidManifest.xml' | head -20 || true
           ls -lh "$AAB"
 
