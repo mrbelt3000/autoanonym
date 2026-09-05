@@ -56,7 +56,20 @@ jobs:
           sed -i 's/versionName = "1.0"/versionName = "1.1"/' "$FILE"
 
           mkdir -p "$ROOT/app/src/main/res/drawable"
-          cat blockdrop/icon.part1 blockdrop/icon.part2 blockdrop/icon.part3 | base64 --decode > "$ROOT/app/src/main/res/drawable/ic_launcher.jpg"
+          python3 - <<'PY'
+          import base64, re
+          from pathlib import Path
+          root = Path('/tmp/blockdrop/BlockDrop-WebView')
+          raw = ''.join(Path(f'blockdrop/icon.part{i}').read_text() for i in (1,2,3))
+          raw = ''.join(re.findall(r'[A-Za-z0-9+/=]', raw)).rstrip('=')
+          raw += '=' * ((4 - len(raw) % 4) % 4)
+          data = base64.b64decode(raw)
+          assert data.startswith(b'\xff\xd8'), 'Icon is not a JPEG'
+          assert data.endswith(b'\xff\xd9'), 'Icon JPEG is incomplete'
+          out = root / 'app/src/main/res/drawable/ic_launcher.jpg'
+          out.write_bytes(data)
+          print('Launcher icon bytes:', len(data))
+          PY
           file "$ROOT/app/src/main/res/drawable/ic_launcher.jpg"
 
           python3 - <<'PY'
